@@ -1,0 +1,50 @@
+import sqlite3
+from datamanager import get_battery_data, get_relay_errors  # Import data from datamanager
+
+def display_battery_status():
+    battery_data = get_battery_data()  # Assuming get_battery_data returns a list of battery data
+    
+    conn = sqlite3.connect('project_data.db')
+    c = conn.cursor()
+    
+    # Insert battery data into the database
+    for data in battery_data:
+        c.execute('INSERT INTO battery_status (column1, column2, column3) VALUES (?, ?, ?)', data)
+    
+    # Commit the changes to the database
+    conn.commit()
+
+    # Retrieve and display battery status
+    c.execute('SELECT * FROM battery_status')
+    rows = c.fetchall()
+    print("Battery Status:")
+    for row in rows:
+        print(row)
+    
+    conn.close()
+
+def display_relay_errors():
+    relay_errors = get_relay_errors()  # Assuming get_relay_errors returns a list of error data
+    
+    conn = sqlite3.connect('project_data.db')
+    c = conn.cursor()
+
+    # Insert relay errors into the database
+    for error in relay_errors:
+        c.execute('INSERT INTO relay_errors (error_column1, error_column2) VALUES (?, ?)', error)
+
+    # Commit the changes to the database
+    conn.commit()
+
+    # Retrieve and display relay errors
+    c.execute('SELECT * FROM relay_errors')
+    rows = c.fetchall()
+    print("\nRelay Errors:")
+    for row in rows:
+        print(row)
+    
+    conn.close()
+
+if __name__ == "__main__":
+    display_battery_status()
+    display_relay_errors()
