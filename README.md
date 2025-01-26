@@ -3,3 +3,5 @@ SparkleBot is an IoT monitoring and management Cleaning system that uses MQTT fo
 
 
 ![sparklebot](https://github.com/user-attachments/assets/923e490a-b414-415e-b4c9-68007f62db8f)
+
+<img src="https://github.com/user-attachments/assets/923e490a-b414-415e-b4c9-68007f62db8f" alt="SparkleBot" width="130">
