@@ -252,6 +252,8 @@ class MainWindow(QMainWindow):
         self.connectionDock.Temperature.setText(str(temp))
         self.connectionDock.Battery.setText(str(battery))
         self.mc.publish_to(DHT_topic, current_data)
+        if self.battery_level==0:
+            self.battery_level==105            
         self.battery_level -= 5  # עדכן את הסוללה
 
 app = QApplication(sys.argv)
