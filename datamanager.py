@@ -14,61 +14,23 @@ ic.configureOutput(prefix=time_format)
 ic.configureOutput(includeContext=False)
 
 
-#--TBD--
-def insert_DB(topic, m_decode):
+
+def insert_DB(client, topic, m_decode):
     # DHT case:
-    if 'DHT' in m_decode: 
-        value=parse_data(m_decode)
-        if value != 'NA':
-            da.add_IOT_data(m_decode.split('From: ')[1].split(' Temperature: ')[0], da.timestamp(), value)
-            # TODO - update IOT device last_updated         
-    # Elec Meter case:
-    elif 'Meter' in m_decode:        
-        da.add_IOT_data('ElectricityMeter', da.timestamp(), m_decode.split(' Electricity: ')[1].split(' Water: ')[0])
-        da.add_IOT_data('WaterMeter', da.timestamp(), m_decode.split(' Water: ')[1])
-#--TBD--
-def parse_data(m_decode):
-    value = 'NA'
-    # 'From: ' + self.name+ ' Temperature: '+str(temp)+' Humidity: '+str(hum)
-    value = m_decode.split(' Temperature: ')[1].split(' Humidity: ')[0]
-    return value
+    if 'DHTEMU' in m_decode:         
+        da.add_IOT_data('DHTEMU::Temperature', da.timestamp(), m_decode.split(' ')[1])
+        battery_level = m_decode.split(' ')[3].split('%')[0]
+        ic(battery_level)  
+        da.add_IOT_data('DHTEMU::Battery', da.timestamp(), battery_level)
+        if float(battery_level) < battery_level_min:
+            warning_message = f"WARNING! Battery level is below {battery_level}: {battery_level}%"
+            ic(warning_message)
+            send_msg(client, pub_topic, warning_message)   
+    
+    # RELAYEMU --TBD--
+    # You can here proccess and insert another data to local DB
 
-#G1
-def insert_battery_status(self, timestamp, battery_level):
-        try:
-            c.execute("INSERT INTO battery_status (timestamp, battery_level) VALUES (?, ?)", (timestamp, battery_level))
-            conn.commit()
-        except sqlite3.Error as e:
-            ic(f"Database error in battery_status: {e}")
-#G2
-def insert_relay_error(self, timestamp, error_message):
-        try:
-            c.execute("INSERT INTO relay_errors (timestamp, error_message) VALUES (?, ?)", (timestamp, error_message))
-            conn.commit()
-        except sqlite3.Error as e:
-            ic(f"Database error in relay_errors: {e}")
 
-#G3
-def poka_govno():    
-    if topic == "pr/home/SparkleBot":
-        if "Battery" in m_decode:
-            try:
-                battery_level = float(m_decode.split('Battery: ')[1].split('%')[0])
-                if battery_level < battery_level_min:
-                    warning_message = f"Battery level is below {battery_level}: {battery_level}%"
-                    ic(warning_message)
-                    
-            except (ValueError, IndexError) as e:
-                ic(f"Error parsing battery level: {e}")
-
-    elif topic == "pr/home/SparkleBot/Relay":
-        if "error" in m_decode.lower():
-            error_message = m_decode
-            ic(f"Error from RELAYEMU: {error_message}")
-            
-    elif topic == "pr/home/button/SparkleBot":
-        error_message = "ATTENTION : SPARKLEBOT IS ON!"
-        ic(error_message)
 
 # MQTT callback functions
 def on_log(client, userdata, level, buf):
@@ -87,7 +49,7 @@ def on_message(client, userdata, msg):
     topic = msg.topic
     m_decode = str(msg.payload.decode("utf-8", "ignore"))
     ic(f"Message from: {topic}", m_decode)
-    insert_DB(topic, m_decode)
+    insert_DB(client, topic, m_decode)
 
 def send_msg(client, topic, message):
     ic(f"Sending message: {message}")

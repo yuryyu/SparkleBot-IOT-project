@@ -32,5 +32,4 @@ db_name = 'data/project_data.db' # SQLite
 db_init =  False   #False # True if we need reinit smart home setup
 
 # Meters consuption limits"
-battery_level_min=30
-Elec_max=1.8
+battery_level_min = 20.0

@@ -248,12 +248,12 @@ class MainWindow(QMainWindow):
         print('Next update')
         temp = 22 + random.randrange(1, 70) / 10
         battery = max(0, self.battery_level)  # וודא שאחוז הסוללה לא יירד מתחת ל-0
-        current_data = f'Temperature: {temp} Battery: {battery}%'
+        current_data = f'DHTEMU:Temperature: {temp} Battery: {battery}%'
         self.connectionDock.Temperature.setText(str(temp))
         self.connectionDock.Battery.setText(str(battery))
         self.mc.publish_to(DHT_topic, current_data)
-        if self.battery_level==0:
-            self.battery_level==105            
+        if self.battery_level==0:            
+            self.battery_level=105            
         self.battery_level -= 5  # עדכן את הסוללה
 
 app = QApplication(sys.argv)
